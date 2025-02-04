@@ -2,30 +2,31 @@ local cells = {}
 local width
 local height
 local w = 10
-local generations
-local genration_len 
+local generations 
 local ruleSet = {0, 0, 0, 0, 0, 0, 0, 0}
 
 
-function flipBit(bit)
+function flip_bit(bit)
     b = tonumber(bit)
     ruleSet[b] = (ruleSet[b] + 1) % 2
 end
+
 
 function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
        love.event.quit()
     end
+
     if key == "r" then
         for i = 1, #ruleSet do
             ruleSet[i] = math.floor(math.random() + 0.5)
         end
-        calculateGenerations(generations)
+        calculate_generations(generations)
     end
 
     if key == "1" or key == "2" or key == "3" or key == "4" or key == "5" or key == "6" or key == "7" or key == "8" then
-        flipBit(key)
-        calculateGenerations(generations)
+        flip_bit(key)
+        calculate_generations(generations)
     end
  end
 
@@ -37,11 +38,11 @@ function love.load()
     width = love.graphics.getWidth()
     height = love.graphics.getHeight()
     generations = height / w
-    gneration_len = width / w
-    calculateGenerations(generations)
+    calculate_generations(generations)
 end
 
-function initialGeneration() 
+
+function initialise() 
     len = width / w
     local initial = {}
     for i = 1, len do
@@ -54,7 +55,8 @@ function initialGeneration()
     return initial
 end
 
-function calcNewState(neighbors)
+
+function calc_new_state(neighbors)
     if neighbors[1] == 1 and neighbors[2] == 1 and neighbors[3] == 1 then
         return ruleSet[1]
     elseif neighbors[1] == 1 and neighbors[2] == 1 and neighbors[3] == 0 then
@@ -73,14 +75,9 @@ function calcNewState(neighbors)
         return ruleSet[8]
     end
 end
-    
-function newGeneration(count) 
-    currentGen = cells[count - 1]
-    newGen = generateNew(currentGen)
-    cells[count] = newGen
-end
 
-function generateNew(current)
+
+function generate_new(current)
     neighbors = {}
     newGen = {}
     local len = #current
@@ -98,10 +95,11 @@ function generateNew(current)
             neighbors[2] = current[i]
             neighbors[3] = current[1]
         end
-        newGen[i] = calcNewState(neighbors)
+        newGen[i] = calc_new_state(neighbors)
     end
     return newGen
 end
+
 
 function table_to_string(tbl)
     local result = "{"
@@ -128,13 +126,15 @@ function table_to_string(tbl)
     return result.."}"
 end
 
-function calculateGenerations(count) 
-    init = initialGeneration()
+
+function calculate_generations(count) 
+    init = initialise()
     cells[1] = init
     for i = 2, count do
-        cells[i] = generateNew(cells[i-1])
+        cells[i] = generate_new(cells[i-1])
     end
 end
+
 
 function rules_to_int(ruleSet)
     return 128 * ruleSet[1] + 
@@ -146,6 +146,7 @@ function rules_to_int(ruleSet)
             2  * ruleSet[7] +
             1  * ruleSet[8]
 end
+
 
 function love.draw()
     love.graphics.setColor(0, 0, 0, 1)
